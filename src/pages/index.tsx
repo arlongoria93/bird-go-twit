@@ -35,7 +35,7 @@ const PostView = (props: PostWithUser) => {
   const { post, author } = props;
   if (!post || !author) return null;
   return (
-    <div className="flex gap-3 border-b border-slate-400 p-4">
+    <div className="flex items-center gap-3 border-b border-slate-400 p-4">
       <Image
         alt="author profile picture"
         width={96}
@@ -51,7 +51,7 @@ const PostView = (props: PostWithUser) => {
             post.createdAt
           ).fromNow()}`}</span>
         </div>
-        <span> {post.content}</span>
+        <span className="text-2xl"> {post.content}</span>
       </div>
     </div>
   );
