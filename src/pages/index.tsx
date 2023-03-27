@@ -18,8 +18,9 @@ const CreatePostWizard = () => {
     onSuccess: () => {
       ctx.posts.getAll.invalidate();
     },
-    onError: () => {
-      toast.error("Are you using Emoji's 🤔🤔?");
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors?.content;
+      if (errorMessage && errorMessage[0]) toast.error(errorMessage[0]);
     },
   });
 
