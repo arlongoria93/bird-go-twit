@@ -8,6 +8,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { LoadingPage } from "~/components/loading";
 import { toast } from "react-hot-toast";
+import { PageLayout } from "~/components/layout";
+import { PostView } from "~/components/postview";
 
 dayjs.extend(relativeTime);
 
@@ -16,7 +18,7 @@ const CreatePostWizard = () => {
   const ctx = api.useContext();
   const { mutate: createPost, isLoading } = api.posts.create.useMutation({
     onSuccess: () => {
-      ctx.posts.getAll.invalidate();
+      void ctx.posts.getAll.invalidate();
     },
     onError: (e) => {
       const errorMessage = e.data?.zodError?.fieldErrors?.content;
@@ -51,46 +53,23 @@ const CreatePostWizard = () => {
     </div>
   );
 };
-type PostWithUser = RouterOutputs["posts"]["getAll"][number];
-const PostView = (props: PostWithUser) => {
-  const { post, author } = props;
-  if (!post || !author) return null;
-  return (
-    <div className="flex items-center gap-3 border-b border-slate-400 p-4">
-      <Image
-        alt="author profile picture"
-        width={56}
-        height={56}
-        src={author.profileImageUrl}
-        className="h-14 w-14 rounded-full"
-      />
-      <div className="flex flex-col">
-        <div className="flex gap-1">
-          <Link href={`/@${author.username}`}>
-            <span className="font-bold">@{author.username}</span>
-          </Link>{" "}
-          <span>·</span>
-          <Link href={`/post/${post.id}`}>
-            {" "}
-            <span className="font-thin text-slate-400">{`${dayjs(
-              post.createdAt
-            ).fromNow()}`}</span>
-          </Link>
-        </div>
-        <span className="text-2xl"> {post.content}</span>
-      </div>
-    </div>
-  );
-};
 
 const Feed = () => {
-  const { data, isLoading: postsLoaded } = api.posts.getAll.useQuery();
-  if (postsLoaded) return <LoadingPage />;
+  const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
+
+  if (postsLoading)
+    return (
+      <div className="flex grow">
+        <LoadingPage />
+      </div>
+    );
+
   if (!data) return <div>Something went wrong</div>;
+
   return (
-    <div className="flex flex-col">
-      {data.map(({ post, author }) => (
-        <PostView key={post.id} post={post} author={author} />
+    <div className="flex grow flex-col overflow-y-scroll">
+      {[...data, ...data, ...data, ...data].map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
       ))}
     </div>
   );
@@ -101,11 +80,7 @@ const Home: NextPage = (props) => {
   api.posts.getAll.useQuery();
   if (!userLoaded) return <div />;
   return (
-    <>
-      <Head>
-        <title>Bird Go Twit</title>
-        <meta name="description" content="Explain yourself with emojis" />
-      </Head>
+    <PageLayout>
       <main className="flex h-screen justify-center">
         <div className="w-full border-x border-slate-400  md:max-w-2xl">
           <div className="flex border-b border-slate-400 p-4 ">
@@ -119,7 +94,7 @@ const Home: NextPage = (props) => {
           <Feed />
         </div>
       </main>
-    </>
+    </PageLayout>
   );
 };
 

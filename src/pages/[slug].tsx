@@ -16,7 +16,7 @@ const ProfilePage: NextPage = (
         <title>{data.username}</title>
         <meta name="description" content="Profile page" />
       </Head>
-      <main className="flex h-screen justify-center">{data.username}</main>
+      <PageLayout>{data.username}</PageLayout>
     </>
   );
 };
@@ -25,6 +25,7 @@ import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db";
 import superjson from "superjson";
+import { PageLayout } from "~/components/layout";
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const ssg = createProxySSGHelpers({
@@ -48,7 +49,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 };
 
-export const getStaticPaths = async () => {
+export const getStaticPaths = () => {
   return { paths: [], fallback: "blocking" };
 };
 
