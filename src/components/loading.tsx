@@ -1,8 +1,6 @@
 import React from "react";
 
-type Props = {};
-
-export const LoadingSpinner = (props: Props) => {
+export const LoadingSpinner = () => {
   return (
     <div role="status">
       <svg
