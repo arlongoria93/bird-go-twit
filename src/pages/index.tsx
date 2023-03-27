@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { LoadingPage } from "~/components/loading";
+import { toast } from "react-hot-toast";
 
 dayjs.extend(relativeTime);
 
@@ -16,6 +17,9 @@ const CreatePostWizard = () => {
   const { mutate: createPost, isLoading } = api.posts.create.useMutation({
     onSuccess: () => {
       ctx.posts.getAll.invalidate();
+    },
+    onError: () => {
+      toast.error("Are you using Emoji's 🤔🤔?");
     },
   });
 
