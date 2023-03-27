@@ -12,6 +12,13 @@ dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
+  const ctx = api.useContext();
+  const { mutate: createPost, isLoading } = api.posts.create.useMutation({
+    onSuccess: () => {
+      ctx.posts.getAll.invalidate();
+    },
+  });
+
   if (!user) return null;
 
   return (
@@ -19,13 +26,22 @@ const CreatePostWizard = () => {
       <Image
         alt="author profile picture"
         src={user.profileImageUrl}
-        className="h-24 rounded-full"
-        width={96}
-        height={96}
+        className="h-14 w-14 rounded-full"
+        width={56}
+        height={56}
       />
       <input
         placeholder="Type some emojis"
         className="grow bg-transparent outline-none"
+        disabled={isLoading}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            createPost({
+              content: e.currentTarget.value,
+            });
+            e.currentTarget.value = "";
+          }
+        }}
       />
     </div>
   );
@@ -38,10 +54,10 @@ const PostView = (props: PostWithUser) => {
     <div className="flex items-center gap-3 border-b border-slate-400 p-4">
       <Image
         alt="author profile picture"
-        width={96}
-        height={96}
+        width={56}
+        height={56}
         src={author.profileImageUrl}
-        className="h-24 rounded-full"
+        className="h-14 w-14 rounded-full"
       />
       <div className="flex flex-col">
         <div className="flex gap-1">
@@ -63,14 +79,14 @@ const Feed = () => {
   if (!data) return <div>Something went wrong</div>;
   return (
     <div className="flex flex-col">
-      {data?.map(({ post, author }) => (
+      {data.map(({ post, author }) => (
         <PostView key={post.id} post={post} author={author} />
       ))}
     </div>
   );
 };
 
-const Home: NextPage = () => {
+const Home: NextPage = (props) => {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
   api.posts.getAll.useQuery();
   if (!userLoaded) return <div />;
